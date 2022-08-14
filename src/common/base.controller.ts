@@ -1,9 +1,9 @@
+import { injectable } from 'inversify';
 import { ILogger } from '../services/logger.interface';
 import { LoggerService } from '../services/logger.service';
+import 'reflect-metadata';
 
+@injectable()
 export abstract class BaseController {
-	logger!: ILogger;
-	constructor(logger: LoggerService) {
-		this.logger = logger;
-	}
+	constructor(private logger: ILogger) {}
 }
