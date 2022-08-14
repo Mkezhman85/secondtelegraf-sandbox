@@ -6,15 +6,26 @@ import { BaseController } from '../common/base.controller';
 import { LoggerService } from '../services/logger.service';
 import { IBotController } from './bot.controller.interface';
 const { leave, enter } = Scenes.Stage;
+import { ILogger } from '../services/logger.interface';
+import { TYPES } from '../types';
+import { injectable, inject } from 'inversify';
+import 'reflect-metadata';
 
+@injectable()
 export class BotController extends BaseController implements IBotController {
 	bot: Telegraf;
-	token: string;
 
-	constructor(token: string, logger: LoggerService) {
-		super(logger);
-		this.token = token;
-		this.bot = new Telegraf(this.token);
+	constructor(@inject(TYPES.ILogger) private loggerService: ILogger) {
+		super(loggerService);
+		this.bot = new Telegraf(this.getToken());
+	}
+
+	getToken(): string {
+		const token = process.env.TOKEN;
+		if (!token) {
+			throw new Error('Не задан токен');
+		}
+		return token;
 	}
 
 	init(): void {
@@ -37,7 +48,7 @@ export class BotController extends BaseController implements IBotController {
 
 			const stage = new Scenes.Stage<IMyContext>([testScene]);
 
-			const bot = new Telegraf<IMyContext>(this.token);
+			const bot = new Telegraf<IMyContext>(this.getToken());
 
 			bot.use(new LocalSession({ database: 'session.json' }).middleware());
 
@@ -55,9 +66,9 @@ export class BotController extends BaseController implements IBotController {
 
 			bot.launch();
 
-			this.logger.log(`[${this.bot.context.botInfo?.first_name}] Бот успешно запущен...`);
+			this.loggerService.log(`[${this.bot.context.botInfo?.first_name}] Бот успешно запущен...`);
 		} catch (err: any) {
-			this.logger.error(err.message);
+			this.loggerService.error(err.message);
 		}
 	}
 }

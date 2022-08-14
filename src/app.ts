@@ -1,27 +1,23 @@
-import { PrismaClient } from '@prisma/client';
 import { BotController } from './bot/bot.controller';
 import { PrismaController } from './prisma/prisma.controller';
 import { ILogger } from './services/logger.interface';
-import { LoggerService } from './services/logger.service';
 import { getData } from './services/test.service';
+import 'reflect-metadata';
+import { injectable, inject } from 'inversify';
+import { TYPES } from './types';
 
+@injectable()
 export class App {
-	prisma: PrismaController;
-	bot: BotController;
-	token: string;
-	logger: ILogger;
-
-	constructor(token: string, logger: ILogger) {
-		this.prisma = new PrismaController(new LoggerService());
-		this.token = token;
-		this.bot = new BotController(this.token, new LoggerService());
-		this.logger = logger;
-	}
+	constructor(
+		@inject(TYPES.BotController) private bot: BotController,
+		@inject(TYPES.ILogger) private loggerService: ILogger,
+		@inject(TYPES.PrismaController) private prisma: PrismaController,
+	) {}
 
 	public async init(): Promise<void> {
-		this.logger.log('Приложение запущено...');
+		this.loggerService.log('Приложение запущено...');
 		await this.prisma.init();
-		// await getData();
+		await getData();
 		await this.bot.init();
 	}
 }
