@@ -6,11 +6,14 @@ import { ILogger } from './services/logger.interface';
 import { TYPES } from './types';
 import { PrismaController } from './prisma/prisma.controller';
 import { IBootstrapReturn } from './common/bootstrapreturn.interface';
+import { ConfigService } from './config/config.service';
+import { IConfigService } from './config/config.service.interface';
 
 export const appBindings = new ContainerModule((bind: interfaces.Bind) => {
 	bind<ILogger>(TYPES.ILogger).to(LoggerService);
 	bind<BotController>(TYPES.BotController).to(BotController);
 	bind<PrismaController>(TYPES.PrismaController).to(PrismaController);
+	bind<IConfigService>(TYPES.ConfigService).to(ConfigService).inSingletonScope();
 	bind<App>(TYPES.Application).to(App);
 });
 

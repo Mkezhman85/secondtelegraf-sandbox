@@ -5,6 +5,7 @@ import { getData } from './services/test.service';
 import 'reflect-metadata';
 import { injectable, inject } from 'inversify';
 import { TYPES } from './types';
+import { IConfigService } from './config/config.service.interface';
 
 @injectable()
 export class App {
@@ -12,6 +13,7 @@ export class App {
 		@inject(TYPES.BotController) private bot: BotController,
 		@inject(TYPES.ILogger) private loggerService: ILogger,
 		@inject(TYPES.PrismaController) private prisma: PrismaController,
+		@inject(TYPES.ConfigService) private configService: IConfigService,
 	) {}
 
 	public async init(): Promise<void> {

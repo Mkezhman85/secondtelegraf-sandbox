@@ -10,18 +10,23 @@ import { ILogger } from '../services/logger.interface';
 import { TYPES } from '../types';
 import { injectable, inject } from 'inversify';
 import 'reflect-metadata';
+import { IConfigService } from '../config/config.service.interface';
 
 @injectable()
 export class BotController extends BaseController implements IBotController {
 	bot: Telegraf;
 
-	constructor(@inject(TYPES.ILogger) private loggerService: ILogger) {
+	constructor(
+		@inject(TYPES.ILogger) private loggerService: ILogger,
+		@inject(TYPES.ConfigService) private configService: IConfigService,
+	) {
 		super(loggerService);
 		this.bot = new Telegraf(this.getToken());
 	}
 
 	getToken(): string {
-		const token = process.env.TOKEN;
+		const token = this.configService.get('TOKEN');
+		// const token = process.env.TOKEN;
 		if (!token) {
 			throw new Error('Не задан токен');
 		}
